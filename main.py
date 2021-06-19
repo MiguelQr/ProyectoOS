@@ -14,6 +14,7 @@ data = {'A':[8,1,7,0],
 #Inicializar con datos, tamaño del OS, tamaño de memoria restante
 gm = GraficoMemoria(data,10, 54)
 
+#Paso del proceso
 paso = 0
 
 #Callback del boton para cada paso
