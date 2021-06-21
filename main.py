@@ -1,6 +1,7 @@
 from tkinter import *
 from tkinter import ttk
 from grafico import GraficoMemoria
+import math
 
 #Diccionario de la tabla de procesos
 data = {'A':[8,1,7,0],
@@ -139,7 +140,7 @@ disponible = gm.siguiente_paso(paso)
 #label4 = Label(text="",bg="gray",width=20)
 #label4.grid(column=2,row=3,rowspan=3,sticky="ns")
 
-frame = Frame(root, bg='cyan')
+frame = Frame(root)
 frame.grid(column=1,row=1,padx=2,sticky="ns",rowspan=6)
 
 os_labels = []
@@ -152,16 +153,17 @@ for i in range(os_size):
     oslabel.grid(column=1,row=i,padx=10)
     os_labels.append(oslabel)
 
-frame2 = Frame(frame)
-frame2.grid(column=0,row=0)
+oslabel = Label(frame,text="OS",bd=-2,anchor="n",bg="blue") 
+oslabel.configure(font=('Arial',10))
+oslabel.grid(column=1,row=0,rowspan=math.ceil(os_size/2),sticky="ns")
 
-osstart = Label(frame2,text="0",bg="gray") 
+osstart = Label(frame,text="0",bd=-2,anchor="n") 
 osstart.configure(font=('Arial',8))
-osstart.grid(column=0,row=0)
+osstart.grid(column=0,row=0,rowspan=2,sticky="ns")
 
-osfinish = Label(frame,text=os_size,bg="gray") 
+osfinish = Label(frame,text=os_size,bd=-2,anchor="n") 
 osfinish.configure(font=('Arial',8))
-osfinish.grid(column=0,row=os_size)
+osfinish.grid(column=0,row=os_size-1,rowspan=2,sticky="ns")
 
 for i in range(os_size,mem_size):
 
