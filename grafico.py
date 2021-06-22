@@ -27,7 +27,8 @@ class GraficoMemoria:
         if not self.data:
             #Terminar el programa
             print("FIN")
-            return []
+            self.reordenar_memoria()
+            return self.espacios
 
         #Checar los procesos en el diccionario de datos
         for key, proceso in self.data.items():
@@ -51,6 +52,8 @@ class GraficoMemoria:
             else:
                 continue
 
+        self.reordenar_memoria()
+
         return self.espacios
 
     def ocupar_memoria(self, nombre, proceso):
@@ -73,8 +76,26 @@ class GraficoMemoria:
                 print(self.espacios)
 
     def reordenar_memoria(self):
-        #TODO juntar los espacios vacios vecinos
-        pass
+        copiaespacios = self.espacios.copy()
+        cambio = False
+        todel = 0
+        for idx, espacio in enumerate(self.espacios):
+            if idx == len(self.espacios)-1:
+                break
+            espacio_sig = self.espacios[idx+1]
+            if espacio[0] == 0 and espacio_sig[0] == 0:
+                copiaespacios[idx][0] = 0                           #No ocupado
+                copiaespacios[idx][1] = espacio[1]                  #Inicio del primero
+                copiaespacios[idx][2] = espacio_sig[2]              #Fin del segundo
+                copiaespacios[idx][3] = espacio[3] + espacio_sig[3] #Tamaño combinado
+                copiaespacios[idx][4] = ''                  #No asignado
+                cambio = True
+                todel = idx+1
+                break
+        if cambio:
+            del copiaespacios[todel]
+            self.espacios = copiaespacios.copy()
+            self.reordenar_memoria()
     
     def anadir_cola(self,nombre,accion):
         self.cola.append([nombre,accion])
