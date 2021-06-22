@@ -5,55 +5,54 @@ class GraficoMemoria:
 
     def __init__(self, data, inicio, maxmem):
         
-        #Datos
+        # Datos
         self.data = data
         
-        #Cantidad de memoria restante (aun no checa fragmentacion)
+        # Cantidad de memoria restante (aun no checa fragmentacion)
         self.memoria = maxmem
         
-        #Espacios de memoria
-        #0 = libre 1 = ocupado, localidad inicio, localidad fin, tamano, letra/nombre del proceso 
+        # Espacios de memoria
+        # 0 = libre | 1 = ocupado, localidad inicio, localidad fin, tamano, letra/nombre del proceso
         self.espacios = [[0, inicio, inicio + maxmem, maxmem,'']]
         
-        #Cola de acciones a realizar (cargar o descargar un proceso)
+        # Cola de acciones a realizar (cargar o descargar un proceso)
         self.cola = []
 
 
     def siguiente_paso(self,paso):
 
-        #Primero checar las acciones pendientes
+        # Primero checar las acciones pendientes
         self.atender_cola()
 
         if not self.data:
-            #Terminar el programa
+            # Terminar el programa
             print("FIN")
             self.reordenar_memoria()
             return self.espacios
 
-        #Checar los procesos en el diccionario de datos
+        # Checar los procesos en el diccionario de datos
         for key, proceso in self.data.items():
 
-            #Es un paso anterior y no ha sido añadido el proceso
+            # Es un paso anterior y no ha sido añadido el proceso
             if paso == proceso[1] - 1 and not proceso[3]:
-                #Preparar para añadir
-                self.anadir_cola(key,1)
-                #Marcar como añadido
+                # Preparar para añadir
+                self.anadir_cola(key, 1)
+                # Marcar como añadido
                 proceso[3] = 1
                 
                 print("Paso "+str(paso)+": Añadiendo "+key)
                 print()
 
-            #Es un paso anterior a la eliminacion del proceso
+            # Es un paso anterior a la eliminacion del proceso
             elif paso == proceso[1] + proceso[2] - 2:
-                #Preparar para eliminar
-                self.anadir_cola(key,0)
+                # Preparar para eliminar
+                self.anadir_cola(key, 0)
                 print("Paso "+str(paso)+": Eliminando "+key)
                 print()
             else:
                 continue
 
         self.reordenar_memoria()
-
         return self.espacios
 
     def ocupar_memoria(self, nombre, proceso):
@@ -80,23 +79,23 @@ class GraficoMemoria:
         cambio = False
         todel = 0
         for idx, espacio in enumerate(self.espacios):
-            if idx == len(self.espacios)-1:
+            if idx == len(self.espacios) - 1:
                 break
-            espacio_sig = self.espacios[idx+1]
+            espacio_sig = self.espacios[idx + 1]
             if espacio[0] == 0 and espacio_sig[0] == 0:
-                copiaespacios[idx][0] = 0                           #No ocupado
-                copiaespacios[idx][1] = espacio[1]                  #Inicio del primero
-                copiaespacios[idx][2] = espacio_sig[2]              #Fin del segundo
-                copiaespacios[idx][3] = espacio[3] + espacio_sig[3] #Tamaño combinado
-                copiaespacios[idx][4] = ''                  #No asignado
+                copiaespacios[idx][0] = 0  # No ocupado
+                copiaespacios[idx][1] = espacio[1]  # Inicio del primero
+                copiaespacios[idx][2] = espacio_sig[2]  # Fin del segundo
+                copiaespacios[idx][3] = espacio[3] + espacio_sig[3]  # Tamaño combinado
+                copiaespacios[idx][4] = ''  # No asignado
                 cambio = True
-                todel = idx+1
+                todel = idx + 1
                 break
         if cambio:
             del copiaespacios[todel]
             self.espacios = copiaespacios.copy()
             self.reordenar_memoria()
-    
+
     def anadir_cola(self,nombre,accion):
         self.cola.append([nombre,accion])
 
@@ -104,25 +103,26 @@ class GraficoMemoria:
         if not self.cola:
             return
 
-        #Backup para quitar los procesos terminados del dic de datos
+        # Backup para quitar los procesos terminados del dic de datos
         newdata = self.data.copy()
 
-        #A veces no se puede realizar la primera accion en la cola (como por falta de espacio)
-        #Iterar hasta que una se pueda
+        # A veces no se puede realizar la primera accion en la cola (como por falta de espacio)
+        # Iterar hasta que una se pueda
         for idx, todo in enumerate(self.cola):
             nombre = todo[0]
             accion = todo[1]
             proceso = self.data[nombre]
 
             if accion:
-                #Se carga el proceso a memoria
+                # Se carga el proceso a memoria
                 
-                #En el caso de que no alcance la memoria
+                # En el caso de que no alcance la memoria
                 if self.memoria < proceso[0]:
-                    #Incrementar el tiempo de llegada y hacer otra accion
+                    # Incrementar el tiempo de llegada y hacer otra acción
                     proceso[1] += 1
                     continue
-                
+
+                # En el caso de que si alcance la memoria
                 self.memoria -= proceso[0]
                 self.data[nombre][3] = 1
                 self.ocupar_memoria(nombre, proceso)
@@ -133,7 +133,7 @@ class GraficoMemoria:
                 #Se elimina el proceso listo del dic de datos
                 del newdata[nombre]
 
+            # Guardar cambios en el diccionario de procesos
             self.data = newdata.copy()
+            # Quitar proceso de la cola de atención
             self.cola.pop(idx)
-
-            break
