@@ -28,7 +28,7 @@ class GraficoMemoria:
             # Terminar el programa
             print("FIN")
             self.reordenar_memoria()
-            return self.espacios
+            return self.espacios, True
 
         # Checar los procesos en el diccionario de datos
         for key, proceso in self.data.items():
@@ -53,7 +53,7 @@ class GraficoMemoria:
                 continue
 
         self.reordenar_memoria()
-        return self.espacios
+        return self.espacios, False
 
     def ocupar_memoria(self, nombre, proceso):
 

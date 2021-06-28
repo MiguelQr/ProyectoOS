@@ -2,6 +2,9 @@ import tkinter
 from tkinter import *
 from tkinter import ttk
 from grafico import GraficoMemoria
+from ttkbootstrap import *
+from tkinter import messagebox
+
 
 # Diccionario de la tabla de procesos
 data = {'A':[8,1,7,0],
@@ -18,8 +21,17 @@ gm = GraficoMemoria(data, 10, 54)
 # Paso del proceso
 paso = 0
 
+# Bandera para terminar la ejecucion
+terminar = False
+
 #Callback del boton para cada paso
 def siguientePaso():
+    global terminar
+    if terminar:
+        messagebox.showinfo(message="Han finalizado todos los procesos.", title="Simulación Finalizada")
+        root.destroy()        
+        return
+
     global paso
     paso += 1
     btn_text.set("Paso: "+str(paso))
@@ -32,7 +44,11 @@ def siguientePaso():
     count_tal = 1
     
     #Obtener listas de los espacios de memoria
-    memoria = gm.siguiente_paso(paso)
+    memoria, listo = gm.siguiente_paso(paso)
+
+    #Doble bandera para que se muestre bien el paso final
+    if listo:
+        terminar = True
 
     for espacio in memoria:
         #Si hay un proceso
@@ -54,12 +70,12 @@ def dibujar_memoria(canvas, memoria_total, tamaño_OS, tabla_procesos_activos, t
 
     # Obtener dimensiones del canvas
     c_height = int(canvas["height"])
-    c_widht = int(canvas["width"])
+    c_width = int(canvas["width"])
 
     # Memoria SO
-    x0 = (c_widht * 0.35) / 2
+    x0 = (c_width * 0.35) / 2
     y0 = 0
-    x1 = ((c_widht * 0.35) / 2) + (c_widht * 0.65)
+    x1 = ((c_width * 0.35) / 2) + (c_width * 0.65)
     y1 = (tamaño_OS / memoria_total) * c_height
     memoria_SO_rectangle = canvas.create_rectangle(x0, y0, x1, y1, fill="#006AC5")
     memoria_SO_label = canvas.create_text((x0+x1)/2, (y0+y1)/2, text="SO", fill="white", font=("Helvetica", 10, "bold"), anchor=CENTER)
@@ -103,7 +119,10 @@ def dibujar_memoria(canvas, memoria_total, tamaño_OS, tabla_procesos_activos, t
             area_libre_tamaño_line = canvas.create_line(x1 - 4, y0 + 3, x1 - 4, y1 - 3, width=2)
             area_libre_tamaño_label = canvas.create_text(x1 - 8, (y0 + y1) / 2, text=str(datos_area_libre[2])+"K", fill="black", font=("Cambria", 9), anchor=E)
         # Etiqueta de fragmentación
-        frag_label = canvas.create_text(c_widht-3, c_height/2, text="Fragmentación", fill="#670902", font=("Helvetica", 10, "bold"), anchor=S, angle=90)
+        frag_label = canvas.create_text(c_width, c_height/2, text="Fragmentación", fill="#670902", font=("Helvetica", 10, "bold"), anchor=S, angle=90)
+
+    # [FIX] Dibujar línea inferior del último rectángulo
+    last_rectangle_bottom_line = canvas.create_line(x0, c_height-1, x1, c_height-1)
 
 
 
@@ -111,8 +130,9 @@ def dibujar_memoria(canvas, memoria_total, tamaño_OS, tabla_procesos_activos, t
 
 # Instanciar y configurar ventana (root)
 root = Tk()
+root_style = Style(theme="litera")
 root.title("MVT")
-root.geometry("720x595")
+root.geometry("722x612")
 root.resizable(False, False)
 
 # Título
@@ -126,7 +146,7 @@ tabla_procesos = ttk.Treeview(frame_tabla_procesos, height=5, columns=("Proceso"
 tabla_procesos.column("#0", width=0, stretch=False)
 tabla_procesos.column("Proceso", anchor=CENTER, width=110, stretch=False)
 tabla_procesos.column("Tamano", anchor=CENTER, width=110, stretch=False)
-tabla_procesos.column("Tiempo", anchor=CENTER, width=110, stretch=False)
+tabla_procesos.column("Tiempo", anchor=CENTER, width=120, stretch=False)
 tabla_procesos.column("Duracion", anchor=CENTER, width=110, stretch=False)
 tabla_procesos.heading("#0", text="", anchor=CENTER)
 tabla_procesos.heading("Proceso", text="Proceso", anchor=CENTER)
@@ -183,8 +203,8 @@ btn.grid(row=4, column=0, columnspan=2, pady=15)
 # Representación gráfica
 frame_rep_grafica = LabelFrame(text="Representación gráfica", labelanchor="nw")
 frame_rep_grafica.grid(row=2, column=1, rowspan=2, sticky="NSEW", padx=(15, 15))
-rep_grafica = Canvas(frame_rep_grafica, height=300, width=273)
-rep_grafica.grid(row=0, column=0, pady=(3, 3))
+rep_grafica = Canvas(frame_rep_grafica, height=300, width=273, borderwidth=0, highlightthickness=0)
+rep_grafica.grid(row=0, column=0, padx=(3, 0), pady=(6, 3))
 dibujar_memoria(rep_grafica, 64, 10, tp, tal)
 
 disponible = gm.siguiente_paso(paso)
