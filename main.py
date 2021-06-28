@@ -210,3 +210,5 @@ dibujar_memoria(rep_grafica, 64, 10, tp, tal)
 disponible = gm.siguiente_paso(paso)
 
 root.mainloop()
+
+#pyinstaller --onefile main.py --collect-all ttkbootstrap

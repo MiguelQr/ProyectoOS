@@ -1,1 +1,0 @@
-cmd /k "cd venv/Scripts/ & activate.bat & cd .. & cd .. & main.py & cd venv/Scripts/ & deactivate.bat & exit"
